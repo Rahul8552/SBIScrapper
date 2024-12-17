@@ -1,9 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Diagnostics;
-using Google.Cloud.Vision.V1;
-using Amazon.Runtime;
-using Amazon.S3;
-using Amazon.S3.Model;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using OpenQA.Selenium;
@@ -11,25 +6,18 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using RestSharp;
 using SeleniumExtras.WaitHelpers;
-using OpenQA.Selenium.Interactions;
 
 namespace IOBBankScrapper
 {
     internal abstract class Program
     {
-        private static string? UserId;
-        private static string? GFileName;
+        private static string? UserId; 
         private static string? Password;
         private static string? LoginId;
         private static string? Upiid;
-        private static decimal? avlBal;
-        private static string? TransferPin; 
-        private static string? accessKey;
-        private static string? secretKey;
-        private static string? serviceURL;
-        private static IAmazonS3 s3Client;
 
-        private const string BankUrl = "https://bankofindia.co.in/";
+        // private const string BankUrl = "https://bankofindia.co.in/";
+        private const string BankUrl = "https://starconnectcbs.bankofindia.com/BankAwayRetail/sgonHttpHandler.aspx?Action.RetUser.Init.001=Y&AppSignonBankId=013&AppType=retail";
         private static readonly string UpiIdStatusURL = "https://91.playludo.app/api/CommonAPI/GetUpiStatus?upiId=" + Upiid;
         private const string SaveTransactionUrl = "https://91uat.playludo.app/api/CommonAPI/SavebankTransaction";
         private static readonly string UpiIdUpdateUrl = "https://91.playludo.app/api/CommonAPI/UpdateDateBasedOnUpi?upiId=";
@@ -223,49 +211,36 @@ namespace IOBBankScrapper
                 bool isLogin = true;
                 while (isLogin)
                 {
-                    log("Close Popup");
-                    wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("/html/body/div[1]/div[1]/div/section/div[1]/div[2]/div/div/section/div/div[2]/div/div/div/div/div/div/div/div[1]/button/picture/img")));
-                    driver.FindElement(By.XPath("/html/body/div[1]/div[1]/div/section/div[1]/div[2]/div/div/section/div/div[2]/div/div/div/div/div/div/div/div[1]/button/picture/img")).Click();
-                    
-                    log("Click Internet Banking");
-                    wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("/html/body/div[1]/header/div/div[3]/div/div/nav/div/ul/li/div/section/div/div/div/div/ul/li[10]/a")));
-                    driver.FindElement(By.XPath("/html/body/div[1]/header/div/div[3]/div/div/nav/div/ul/li/div/section/div/div/div/div/ul/li[10]/a")).Click();
-                    
-                    log("Select Personal Login");
-                    wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("/html/body/div[1]/header/div/div[3]/div/div/nav/div/ul/li/div/section/div/div/div/div/ul/li[10]/div/div[3]/span[2]/a")));
-                    driver.FindElement(By.XPath("/html/body/div[1]/header/div/div[3]/div/div/nav/div/ul/li/div/section/div/div/div/div/ul/li[10]/div/div[3]/span[2]/a")).Click();
-                    
-                    log("Agree Terms and Conditions");
-                    wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("/html/body/div[1]/div[1]/div/footer/div/section/div/div[2]/div/div/div/div/div/div/div[3]/button")));
-                    driver.FindElement(By.XPath("/html/body/div[1]/div[1]/div/footer/div/section/div/div[2]/div/div/div/div/div/div/div[3]/button")).Click();
-                    
-                    if (IsAlertPresent(driver))
-                    {
-                        AlertHandle(driver);
-                    }
-                    
-                    // log("Going on Iframe");
-                    // IWebElement iframeElement = driver.FindElement(By.XPath("/html/body/iframe"));
+                    // log("Close Popup");
+                    // wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("/html/body/div[1]/div[1]/div/section/div[1]/div[2]/div/div/section/div/div[2]/div/div/div/div/div/div/div/div[1]/button/picture/img")));
+                    // driver.FindElement(By.XPath("/html/body/div[1]/div[1]/div/section/div[1]/div[2]/div/div/section/div/div[2]/div/div/div/div/div/div/div/div[1]/button/picture/img")).Click();
                     //
-                    // // Switch to the iframe context
-                    // driver.SwitchTo().Frame(iframeElement);
-
-                    // // Now you can perform operations within the iframe
-                    // IWebElement elementInsideIframe = driver.FindElement(By.CssSelector("div.swiper-slide[data-swiper-column='0'][data-swiper-row='1'] > a.linksPane.accountStatementEnhance.canvasSubMenuLink"));
-                    // elementInsideIframe.Click();
+                    // log("Click Internet Banking");
+                    // wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("/html/body/div[1]/header/div/div[3]/div/div/nav/div/ul/li/div/section/div/div/div/div/ul/li[10]/a")));
+                    // driver.FindElement(By.XPath("/html/body/div[1]/header/div/div[3]/div/div/nav/div/ul/li/div/section/div/div/div/div/ul/li[10]/a")).Click();
+                    //
+                    // log("Select Personal Login");
+                    // wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("/html/body/div[1]/header/div/div[3]/div/div/nav/div/ul/li/div/section/div/div/div/div/ul/li[10]/div/div[3]/span[2]/a")));
+                    // driver.FindElement(By.XPath("/html/body/div[1]/header/div/div[3]/div/div/nav/div/ul/li/div/section/div/div/div/div/ul/li[10]/div/div[3]/span[2]/a")).Click();
+                    //
+                    // log("Agree Terms and Conditions");
+                    // wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("/html/body/div[1]/div[1]/div/footer/div/section/div/div[2]/div/div/div/div/div/div/div[3]/button")));
+                    // driver.FindElement(By.XPath("/html/body/div[1]/div[1]/div/footer/div/section/div/div[2]/div/div/div/div/div/div/div[3]/button")).Click();
                     
-                    sleep(10);
+                    wait.Until(ExpectedConditions.ElementIsVisible(By.Id("CorporateSignonCorpId")));
                     //IWebElement elementInsideIframe = TypingElement(driver, 30, By.Id("/html/body/jsp:forward/form/center/div/div/div[2]/div[3]/div[1]/input[1]"), UserId, "UserId")
-                    TypingElement(driver, 30, By.XPath("/html/body/jsp:forward/form/center/div/div/div[2]/div[3]/div[1]/input[1]"), UserId, "UserId");
+                    TypingElement(driver, 30, By.Id("CorporateSignonCorpId"), UserId, "UserId");
                     TypingElement(driver, 30, By.Id("id_password"), Password, "Password");
                     
                     log("Trying to solve CAPTCHA");
                     sleep(2);
-                    wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("/html/body/jsp:forward/form/center/div/div/div[2]/div[3]/div[1]/img[2]")));
-
-                    IWebElement imageElement = driver.FindElement(By.XPath("/html/body/jsp:forward/form/center/div/div/div[2]/div[3]/div[1]/img[2]"));
+                    string simpleXpath = "/html/body//form/center/div/div/div[2]/div[3]/div[1]/img[2]";
+                    wait.Until(ExpectedConditions.ElementIsVisible(By.XPath(simpleXpath)));
                     
-                    var imageCaptcha = driver.FindElement(By.XPath("/html/body/jsp:forward/form/center/div/div/div[2]/div[3]/div[1]/img[2]"));
+
+                    IWebElement imageElement = driver.FindElement(By.XPath(simpleXpath));
+                    
+                    var imageCaptcha = driver.FindElement(By.XPath(simpleXpath));
                     var elementScreenshot = ((ITakesScreenshot)imageCaptcha).GetScreenshot();
                     
                     const string fileName = "captchaFile";
@@ -505,40 +480,6 @@ namespace IOBBankScrapper
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return "1";
-            }
-        }
-        
-        private static string GetCaptchaCode(OpenQA.Selenium.IWebDriver driver, string imgDirectory)
-        {
-            DirectoryInfo di = new DirectoryInfo("ScreenShotFolder/");
-            string NewImageDir = di.FullName;
-            string textCaptcha = GetVarificationCodeFromCaptchaImage(NewImageDir + "captchafile.jpg");
-            return (textCaptcha);
-        }
-
-        private static string GetVarificationCodeFromCaptchaImage(string ImgDir)
-        {
-            try
-            {
-                var imagePath = Path.GetFullPath(ImgDir);
-                var imageFile = Google.Cloud.Vision.V1.Image.FromFile(imagePath);
-                // const string jsonPath = "deep-hook-422510-g8-72c1834044eb.json";
-                string? jsonPath = GFileName;
-                var imageAnnotatorClientBuilder = new ImageAnnotatorClientBuilder
-                {
-                    CredentialsPath = jsonPath
-                };
-                var client = imageAnnotatorClientBuilder.Build();
-                IReadOnlyList<EntityAnnotation> textAnnotations = client.DetectText(imageFile);
-                string annoteStr = textAnnotations[0].Description.Replace("\n", "").Replace("\r", "").Replace(" ", "")
-                    .Replace("?", "");
-                log(annoteStr);
-                return (annoteStr.All(char.IsLetterOrDigit) && (annoteStr.Length == 6)) ? annoteStr : "1";
-            }
-            catch (Exception ex)
-            {
-                log("exception1 " + ex.Message);
                 return "1";
             }
         }
@@ -887,7 +828,6 @@ namespace IOBBankScrapper
             var configuration = configurationBuilder.Build();
             var appSettingsSection = configuration.GetSection("AppSettings");
             Password = appSettingsSection["Password"];
-            //LoginId = appSettingsSection["LoginId"];
             Upiid = appSettingsSection["Upiid"];
             UserId = appSettingsSection["UserName"];
         }
